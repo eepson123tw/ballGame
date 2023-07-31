@@ -3,7 +3,9 @@ import './style.css'
 import ReactDOM from 'react-dom/client'
 import { Canvas } from '@react-three/fiber'
 import BallGame from './BallGame.jsx'
+import Interface from './components/Interface'
 import { KeyboardControls } from '@react-three/drei'
+
 const root = ReactDOM.createRoot(document.querySelector('#root'))
 
 root.render(
@@ -27,5 +29,6 @@ root.render(
     >
       <BallGame />
     </Canvas>
+    <Interface />
   </KeyboardControls>
 )

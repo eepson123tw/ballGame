@@ -1,5 +1,5 @@
 // @ts-nocheck
-import React, { useMemo, useState, useRef } from 'react'
+import React, { useMemo, useState, useRef, useEffect } from 'react'
 import * as THREE from 'three'
 import { RigidBody, CuboidCollider } from '@react-three/rapier'
 import { useFrame, useLoader } from '@react-three/fiber'
@@ -7,7 +7,9 @@ import {
   useGLTF,
   CubeCamera,
   Caustics,
-  MeshRefractionMaterial
+  MeshRefractionMaterial,
+  Text,
+  Float
 } from '@react-three/drei'
 import { Bloom, EffectComposer } from '@react-three/postprocessing'
 const boxGeometry = new THREE.BoxGeometry(1, 1, 1)
@@ -16,12 +18,30 @@ const floorTwo = new THREE.MeshStandardMaterial({ color: 'greenyellow' })
 const obstacleMaterial = new THREE.MeshStandardMaterial({ color: 'orangered' })
 const goalMaterial = new THREE.MeshStandardMaterial({ color: 'lightblue' })
 const wallMaterial = new THREE.MeshStandardMaterial({ color: 'slategrey' })
-
+const skyMaterial = new THREE.MeshStandardMaterial({ color: '#E5E5E6' })
 import { RGBELoader } from 'three/examples/jsm/loaders/RGBELoader'
 
 export function BlockStart({ position = [0, 0, 0] }) {
   return (
     <group position={position}>
+      <Float
+        position={[0, 1.5, 0]}
+        floatIntensity={0.25}
+        rotationIntensity={0.25}
+      >
+        <Text
+          font='./bebas-neue-v9-latin-regular.woff'
+          scale={0.5}
+          maxWidth={0.25}
+          lineHeight={0.75}
+          textAlign='right'
+          position={[0.75, 0.65, 0]}
+          rotation-y={-0.25}
+        >
+          Ball Race
+          <meshBasicMaterial toneMapped={false} />
+        </Text>
+      </Float>
       {/* floor */}
       <mesh
         geometry={boxGeometry}
@@ -156,7 +176,7 @@ export function BlockAxe({ position = [0, 0, 0] }) {
 export function BlockEnd({ position = [0, 0, 0] }) {
   //todo 加上台階
   return (
-    <RigidBody type=''>
+    <RigidBody type='fixed'>
       <group position={[position[0], 2, position[2]]}>
         <mesh
           geometry={boxGeometry}
@@ -165,6 +185,41 @@ export function BlockEnd({ position = [0, 0, 0] }) {
           receiveShadow
         />
       </group>
+      <mesh
+        position={[position[0] - 1.2, 0.2, position[2] + 2.5]}
+        geometry={boxGeometry}
+        material={floorOne}
+        scale={[1, 0.3, 1]}
+        receiveShadow
+      />
+      <mesh
+        position={[position[0], 1.2, position[2] + 2.5]}
+        geometry={boxGeometry}
+        material={floorOne}
+        scale={[1, 0.3, 1]}
+        receiveShadow
+      />
+      <mesh
+        position={[position[0] + 1.2, 2, position[2] + 2.5]}
+        geometry={boxGeometry}
+        material={floorOne}
+        scale={[1, 0.3, 1]}
+        receiveShadow
+      />
+      <mesh
+        position={[position[0] + 2.6, 2.6, position[2] + 2.5]}
+        geometry={boxGeometry}
+        material={floorOne}
+        scale={[1, 0.3, 1]}
+        receiveShadow
+      />
+      <mesh
+        position={[position[0] + 1.8, 3.5, position[2] + 1.45]}
+        geometry={boxGeometry}
+        material={skyMaterial}
+        scale={[1, 0.1, 2]}
+        receiveShadow
+      />
     </RigidBody>
   )
 }
@@ -286,7 +341,8 @@ function Bounds({ length = 1 }) {
 
 export function Level({
   count = 3,
-  types = [BlockSpinner, BlockAxe, BlockLimbo]
+  types = [BlockSpinner, BlockAxe, BlockLimbo],
+  speed = 0
 }) {
   const blocks = useMemo(() => {
     const blocks = []
@@ -296,7 +352,7 @@ export function Level({
     }
 
     return blocks
-  }, [count, types])
+  }, [count, types, speed])
   return (
     <>
       <color attach={'background'} args={['#f0f0f0']}></color>

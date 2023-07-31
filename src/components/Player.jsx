@@ -3,6 +3,7 @@ import React, { useMemo, useState, useRef, useEffect } from 'react'
 import { RigidBody, useRapier } from '@react-three/rapier'
 import { useFrame, useLoader } from '@react-three/fiber'
 import { useKeyboardControls } from '@react-three/drei'
+import useGame from '../stores/useGame'
 import * as THREE from 'three'
 export default function Player() {
   const [subscribeKeys, getKeys] = useKeyboardControls()
@@ -11,6 +12,11 @@ export default function Player() {
   // 最佳化
   const [smoothCameraPosition] = useState(() => new THREE.Vector3(10, -10, 10))
   const [smoothCameraTarget] = useState(() => new THREE.Vector3())
+
+  const start = useGame((state) => state.start)
+  const end = useGame((state) => state.end)
+  const blocksCount = useGame((state) => state.blocksCount)
+  const restart = useGame((state) => state.restart)
   useFrame((state, delta) => {
     /**
      * controls
@@ -63,6 +69,14 @@ export default function Player() {
 
     state.camera.position.copy(smoothCameraPosition)
     state.camera.lookAt(smoothCameraTarget)
+    /**
+     * Phases
+     */
+    console.log(ballPosition.z <= -(blocksCount * 4 + 2 + 2))
+    if (ballPosition.z <= -(blocksCount * 4 + 2 + 2) && ballPosition.y >= 4.2)
+      end()
+
+    if (ballPosition.y < -4) restart()
   })
 
   const jump = () => {
@@ -75,7 +89,23 @@ export default function Player() {
       ball.current.applyImpulse({ x: 0, y: 0.5, z: 0 })
     }
   }
+
+  const reset = () => {
+    ball.current.setTranslation({ x: 0, y: 1, z: 0 })
+    ball.current.setLinvel({ x: 0, y: 0, z: 0 })
+    ball.current.setAngvel({ x: 0, y: 0, z: 0 })
+  }
+
   useEffect(() => {
+    useGame.subscribe(
+      (state) => state.phase,
+      (value) => {
+        if (value === 'ready') {
+          reset()
+        }
+      }
+    )
+
     const unsubscribeJump = subscribeKeys(
       (state) => state.jump, // listen Event
       (value) => {
@@ -84,8 +114,13 @@ export default function Player() {
         }
       }
     )
+    const unsubscribeAny = subscribeKeys(() => {
+      start()
+    })
+
     return () => {
       unsubscribeJump() //因為 rerender 時 subscribeKeys　會被觸發２次
+      unsubscribeAny()
     }
   }, [])
 
