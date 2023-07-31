@@ -1,8 +1,16 @@
 // @ts-nocheck
+import React, { useMemo, useState, useRef, useEffect } from 'react'
+import { useFrame } from '@react-three/fiber'
 export default function Lights() {
+  const lightRef = useRef()
+  useFrame((state) => {
+    lightRef.current.position.z = state.camera.position.z + 1
+    lightRef.current.target.position.z = state.camera.position.z
+  })
   return (
     <>
       <directionalLight
+        ref={lightRef}
         castShadow
         position={[4, 4, 1]}
         intensity={1.5}

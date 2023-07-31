@@ -115,10 +115,10 @@ export function BlockLimbo({ position = [0, 0, 0] }) {
 
 export function BlockAxe({ position = [0, 0, 0] }) {
   const obstacle = useRef()
-  const [timeOffset] = useState(() => Math.random() * Math.PI * 2)
+  const [timeOffset] = useState(() => Math.random() * Math.PI)
   useFrame((state, delta) => {
     const time = state.clock.getElapsedTime() * 4
-    const x = Math.sin(time + timeOffset) * 1.25
+    const x = Math.sin(time + timeOffset)
     obstacle.current.setNextKinematicTranslation({
       x: position[0] + x,
       y: position[1] + 1.4,
@@ -144,7 +144,7 @@ export function BlockAxe({ position = [0, 0, 0] }) {
         <mesh
           geometry={boxGeometry}
           material={obstacleMaterial}
-          scale={[2.5, 2.5, 0.3]}
+          scale={[2.2, 2.5, 0.3]}
           castShadow
           receiveShadow
         ></mesh>
@@ -156,14 +156,16 @@ export function BlockAxe({ position = [0, 0, 0] }) {
 export function BlockEnd({ position = [0, 0, 0] }) {
   //todo 加上台階
   return (
-    <group position={[position[0], 2, position[2]]}>
-      <mesh
-        geometry={boxGeometry}
-        material={floorOne}
-        scale={[4, 4, 4]}
-        receiveShadow
-      />
-    </group>
+    <RigidBody type=''>
+      <group position={[position[0], 2, position[2]]}>
+        <mesh
+          geometry={boxGeometry}
+          material={floorOne}
+          scale={[4, 4, 4]}
+          receiveShadow
+        />
+      </group>
+    </RigidBody>
   )
 }
 
