@@ -4,8 +4,10 @@ import { useFrame } from '@react-three/fiber'
 export default function Lights() {
   const lightRef = useRef()
   useFrame((state) => {
-    lightRef.current.position.z = state.camera.position.z + 1
-    lightRef.current.target.position.z = state.camera.position.z
+    //讓光影跟著相機跑
+    lightRef.current.position.z = state.camera.position.z + 1 - 4
+    lightRef.current.target.position.z = state.camera.position.z - 4
+    lightRef.current.target.updateMatrixWorld()
   })
   return (
     <>
